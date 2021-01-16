@@ -23,7 +23,7 @@ namespace Manage.Api.Controllers
             productService = new ProductService(productRepository, categoryRepository, mapper);
         }
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody]CreateProductRequest request)
+        public async Task<ActionResult> Create([FromBody] CreateProductRequest request)
         {
             var result = await productService.Create(request);
             return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);
@@ -49,8 +49,14 @@ namespace Manage.Api.Controllers
             return result.Any() ? Ok(result) : NotFound();
         }
 
+        [HttpGet("nip/{nip}")]
+        public async Task<ActionResult<ICollection<ProductDTO>>> GetByNip(string nip)
+        {
+            return Ok();
+        }
+
         [HttpPut("{id}")]
-        public async Task<ActionResult<ProductUpdateResponse>> Update([FromBody]CreateProductRequest request, long id)
+        public async Task<ActionResult<ProductUpdateResponse>> Update([FromBody] CreateProductRequest request, long id)
         {
             var result = await productService.Update(request, id);
             return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);

@@ -81,6 +81,11 @@ namespace Manage.Core.Services
             return mapper.Map<List<ProductDTO>>(products.ToList());
         }
 
+        public Task<ICollection<ProductDTO>> GetByNip(string nip)
+        {
+            throw new NotImplementedException();
+        }
+
         public async Task<ProductUpdateResponse> Update(CreateProductRequest request, long id)
         {
             var foundProduct = await Task.Run(() => productRepository.GetIncludeCategory(id));
