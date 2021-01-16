@@ -50,10 +50,16 @@ namespace Manage.Api.Controllers
             return result.Any() ? Ok(result) : NotFound();
         }
 
-        [HttpGet("nip/{nip}")]
+        /// <summary>
+        /// Returns collection of all products. If nip is given, then it returns collection of products
+        /// which prices are replaced by prices set for contractor.
+        /// </summary>
+        /// <param name="nip">Nip of contractor</param>
+        /// <returns></returns>
+        [HttpGet("nip/{nip}")]     
         public async Task<ActionResult<ICollection<ProductDTO>>> GetByNip(string nip)
         {
-            return Ok();
+            return Ok(await productService.GetByNip(nip));
         }
 
         [HttpPut("{id}")]
