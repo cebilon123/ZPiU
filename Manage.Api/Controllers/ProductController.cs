@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Manage.Core.ExternalProviders.Interfaces;
 using Manage.Core.Models.Category;
 using Manage.Core.Models.Product;
 using Manage.Core.Services;
@@ -18,9 +19,9 @@ namespace Manage.Api.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService productService;
-        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper)
+        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IContractorProvider contractorProvider, IContractorPriceRepostiory contractorPriceRepostiory, IMapper mapper)
         {
-            productService = new ProductService(productRepository, categoryRepository, mapper);
+            productService = new ProductService(productRepository, categoryRepository, contractorProvider, contractorPriceRepostiory, mapper);
         }
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] CreateProductRequest request)

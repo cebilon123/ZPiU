@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Manage.Core.ExternalProviders.Interfaces;
 using Manage.Core.Models;
 using Manage.Core.Models.Product;
 using Manage.Core.Services.Interfaces;
@@ -16,12 +17,16 @@ namespace Manage.Core.Services
     {
         private readonly IProductRepository productRepository;
         private readonly ICategoryRepository categoryRepository;
+        private readonly IContractorProvider contractorProvider;
+        private readonly IContractorPriceRepostiory contractorPriceRepostiory;
         private readonly IMapper mapper;
 
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper)
+        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IContractorProvider contractorProvider, IContractorPriceRepostiory contractorPriceRepostiory, IMapper mapper)
         {
             this.productRepository = productRepository;
             this.categoryRepository = categoryRepository;
+            this.contractorProvider = contractorProvider;
+            this.contractorPriceRepostiory = contractorPriceRepostiory;
             this.mapper = mapper;
         }
 
@@ -81,9 +86,29 @@ namespace Manage.Core.Services
             return mapper.Map<List<ProductDTO>>(products.ToList());
         }
 
-        public Task<ICollection<ProductDTO>> GetByNip(string nip)
+        public async Task<ICollection<ProductDTO>> GetByNip(string nip)
         {
-            throw new NotImplementedException();
+            var foundContractor = await contractorProvider
+                .GetContractorByNip(nip);
+
+            if (foundContractor is null)
+                return null;
+
+            var contractorPrices = contractorPriceRepostiory
+                .GetByContractorId(foundContractor.Id);
+
+            var products = await GetAll();
+
+            products.ToList()
+                .ForEach(p =>
+                {
+                    if(contractorPrices.FirstOrDefault(c => c.ProductId == p.Id) is ContractorPrice contractorPrice)
+                    {
+                        p.Price = contractorPrice.Price;
+                    }
+                });
+
+            return products;
         }
 
         public async Task<ProductUpdateResponse> Update(CreateProductRequest request, long id)
