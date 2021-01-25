@@ -9,7 +9,8 @@ namespace Manage.Data.Repositories.Interfaces
 {
     public interface IContractorPriceRepostiory: IBaseRepository<ContractorPrice>
     {
-        ContractorPrice GetByProductId(long productId);
+        ContractorPrice GetByContractorIdAndProductId(long contractorId, long productId);
+        IEnumerable<ContractorPrice> GetByProductId(long productId);
         IEnumerable<ContractorPrice> GetByContractorId(long contractorId);
     }
 }

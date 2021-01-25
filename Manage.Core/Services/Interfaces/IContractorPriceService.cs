@@ -13,7 +13,7 @@ namespace Manage.Core.Services.Interfaces
         Task<BaseReponse> Create(ContractorPriceCreate request);
         Task<BaseReponse> Delete(long contractorId, long productId);
         Task<ICollection<ContractorPriceDTO>> GetList(long contractorId);
-        Task<ContractorPriceDTO> GetByProductId(long productId);
+        Task<ICollection<ContractorPriceDTO>> GetByProductId(long productId);
         Task<CategoryUpdateResponse> Update(ContractorPriceCreate request, long contractorPriceId);
     }
 }

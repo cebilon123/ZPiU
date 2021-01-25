@@ -3,8 +3,9 @@ import classNames from 'classnames'
 import { Button, Card, Col, Form, InputGroup, ListGroup, Table } from 'react-bootstrap'
 import { config } from '../Constants'
 import ProductEditor from './ProductEditor'
-import { SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp } from 'react-bootstrap-icons';
+import { Pencil, SortAlphaDown, SortAlphaUp, SortNumericDown, SortNumericUp, X } from 'react-bootstrap-icons'
 import { ICategory } from './Categories'
+import _ from 'underscore'
 
 export interface IProduct {
 	id: number
@@ -54,6 +55,7 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 		this.handleCancel = this.handleCancel.bind(this)
 		this.handleEdit = this.handleEdit.bind(this)
 		this.toggleSearch = this.toggleSearch.bind(this)
+		// this.handleSearchInputChange = _.throttle(this.handleSearchInputChange.bind(this), 300) // this is buggy
 		this.handleSearchInputChange = this.handleSearchInputChange.bind(this)
 	}
 
@@ -205,10 +207,10 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 			<Card>
 				<Card.Header>Items <Button className="ml-4" onClick={this.handleAdd}>Add</Button> <Button variant="secondary" onClick={this.toggleSearch}>Search</Button></Card.Header>
 				{this.state.searchOpen && this.renderSearch()}
-				<Table striped hover>
+				<Table>
 					<thead>
 						<tr>
-							<th># {this.renderSortIcon('id', true)}</th>
+							<th>Id {this.renderSortIcon('id', true)}</th>
 							<th>Name {this.renderSortIcon('name', false)}</th> {/*style={{width: "100%"}}*/}
 							<th>Price {this.renderSortIcon('price', true)}</th>
 							<th>Unit</th>
@@ -230,7 +232,7 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 							if (!this.state.searchParams) return true
 							const { id, name, categoryId } = this.state.searchParams
 							if (id !== undefined && id !== p.id) return false
-							if (name && !p.name.toLocaleLowerCase().startsWith(name.toLocaleLowerCase())) return false
+							if (name && p.name.toLocaleLowerCase().search(name.toLocaleLowerCase()) == -1) return false
 							if (categoryId !== undefined && !isNaN(categoryId) && p.category?.id !== categoryId) return false
 							return true
 						}).map((product, index) => {
@@ -246,7 +248,7 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 										<td>{product.gtuCode}</td>
 										<td>{product.category?.name}</td>
 										<td>
-											<a href="#" className="text-primary" onClick={()=>this.handleEdit(product.id)}>Edit</a>&nbsp;&nbsp;<a href="#" className="text-danger" onClick={()=>this.handleRemove(product.id)}>Remove</a>
+											<a href="#" className="text-primary" onClick={()=>this.handleEdit(product.id)}><Pencil/></a>&nbsp;&nbsp;<a href="#" className="text-danger" onClick={()=>this.handleRemove(product.id)}><X/></a>
 										</td>
 									</tr>
 									{this.state.editingId === product.id && <tr><td colSpan={9}><ProductEditor onSubmit={this.handleSubmit} onCancel={this.handleCancel} productId={product.id} categories={this.props.categories}></ProductEditor></td></tr>}

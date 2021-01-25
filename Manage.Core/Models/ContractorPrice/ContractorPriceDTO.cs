@@ -10,6 +10,7 @@ namespace Manage.Core.Models.ContractorPrice
     {
         public long Id { get; set; }
         public long ProductId { get; set; }
+        public long ContractorId { get; set; }
         public string ProductName { get; set; }
         public decimal Price { get; set; }
     }

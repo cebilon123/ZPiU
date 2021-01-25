@@ -2,6 +2,7 @@ import React, { Component, ChangeEvent } from 'react'
 import classNames from 'classnames'
 import { Button, Card, Form, InputGroup, ListGroup } from 'react-bootstrap'
 import { config } from '../Constants'
+import { X } from 'react-bootstrap-icons'
 
 export interface ICategory {
 	id: number
@@ -84,7 +85,7 @@ class Categories extends Component<ICategoriesProps, ICategoriesState> {
 				<ListGroup variant="flush">
 					{this.state.categories.map((value, index) => {
         				return (
-							<ListGroup.Item key={index}>{value.name} <a href="#" className="text-danger float-right" onClick={()=>this.handleRemove(value.id)}>Remove</a></ListGroup.Item>
+							<ListGroup.Item key={index}>{value.name} <a href="#" className="text-danger float-right" onClick={()=>this.handleRemove(value.id)}><X/></a></ListGroup.Item>
 						)
 						})
 					}

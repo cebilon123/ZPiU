@@ -4,9 +4,18 @@ import { Button, Card, Col, Form, InputGroup, ListGroup, Table } from 'react-boo
 import { config } from '../Constants'
 import { IProduct } from './ProductList'
 import { ICategory } from './Categories'
+import { X } from 'react-bootstrap-icons'
 
+interface IContractorPrice {
+	contractorId: number
+	productId: number
+	price: number
+}
 interface IProductEditorState {
-	product: IProduct
+	product: IProduct,
+	addingContractor: { nip?: number, price?: number }
+	foundContractor?: { Id: number, Name: string }
+	contractorPrices: IContractorPrice[]
 }
 
 interface IProductEditorProps {
@@ -18,6 +27,7 @@ interface IProductEditorProps {
 
 class ProductEditor extends Component<IProductEditorProps, IProductEditorState> {
 	private urlBase = config.url.API_URL
+	private contractorUrlBase = config.url.CONTRACTOR_API_URL
 
 	constructor(props: Readonly<IProductEditorProps>) {
 		super(props)
@@ -32,12 +42,17 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 				unit: '',
 				pkwiuCode: '',
 				gtuCode: ''
-			}
+			},
+			addingContractor: {},
+			contractorPrices: []
 		}
 
 		this.handleInputChange = this.handleInputChange.bind(this)
 		this.handleSubmit = this.handleSubmit.bind(this)
 		this.handleRemove = this.handleRemove.bind(this)
+		this.handleAddContractorPrice = this.handleAddContractorPrice.bind(this)
+		this.handleContractorInputChange = this.handleContractorInputChange.bind(this)
+		this.fetchContractor = this.fetchContractor.bind(this)
 	}
 
 	handleInputChange(event: any) {
@@ -46,7 +61,21 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 		const name = target.name;
 	
 		this.setState({
-		  product: { ...this.state.product, [name]: value } as IProduct
+			product: { ...this.state.product, [name]: value } as IProduct
+		})
+	}
+
+	handleContractorInputChange(event: any) {
+		const target = event.target;
+		const value = target.type === 'checkbox' ? target.checked : target.value;
+		const name = target.name;
+
+		if (name === 'nip' && value.length === 10) {
+			this.fetchContractor(value)
+		}
+	
+		this.setState({
+			addingContractor: { ...this.state.addingContractor, [name]: value } as IProductEditorState['addingContractor']
 		})
 	}
 
@@ -73,8 +102,16 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 		fetch(this.urlBase+`/api/Product/${id}`, {
 			method: 'DELETE',
 		})
-			.then(res => res.json())
 			.then(() => {
+			})
+	}
+
+	handleRemoveContractorPrice(contractorId: number) {
+		fetch(this.urlBase+`/api/ContractorPrice/${contractorId}/${this.props.productId}`, {
+			method: 'DELETE',
+		})
+			.then(() => {
+				this.fetchContractorPrices()
 			})
 	}
 
@@ -88,13 +125,52 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 			})
 	}
 
-	handleAddContractorPrice() {
+	fetchContractor(nip: string) {
+		fetch(this.contractorUrlBase+`/kontrahenci/nip/${nip}`)
+			.then(res => {
+				if (res.status !== 200) {
+					this.setState({foundContractor: undefined})
+					return
+				}
 
+				res.json().then((contractor) => {
+					this.setState({foundContractor: contractor})
+				})
+			})
+	}
+
+	fetchContractorPrices() {
+		fetch(this.urlBase+`/api/ContractorPrice/Product/${this.props.productId}`)
+			.then(res => {
+				if (res.status !== 200) return
+				res.json().then((contractorPrices) => {
+					console.log(contractorPrices)
+					this.setState({ contractorPrices })
+				})
+			})
+	}
+
+	handleAddContractorPrice() {
+		if (this.state.foundContractor) {
+			fetch(this.urlBase+'/api/ContractorPrice/', {
+				method: 'POST',
+				headers: {
+					'Content-Type': 'application/json'
+				},
+				body: JSON.stringify({ productId: this.state.product.id, contractorId: this.state.foundContractor.Id, price: this.state.addingContractor.price })
+			})
+				.then(res => {
+					console.log(this.state.product)
+					if (res.status !== 200) return
+					this.fetchContractorPrices()
+				})
+		}
 	}
 
 	componentDidMount() {
 		if (this.props.productId !== undefined) {
 			this.fetchProduct()
+			this.fetchContractorPrices()
 		}
 	}
 
@@ -171,24 +247,52 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 							</Form.Control>
 					</Form.Group>
 				</Form.Row>
-				<Table striped className="mb-2">
-					<thead>
-						<tr>
-							<th>#</th>
-							<th>Contractor</th>
-							<th>Price</th>
-							<th></th>
-						</tr>
-					</thead>
-					<tbody>
-						
-					</tbody>
-				</Table>
-				
-				<Button variant="primary" type="button" onClick={this.handleSubmit} className="mb-2">Add Contractor Price</Button> <br></br>
-
 				<Button variant="primary" type="button" onClick={this.handleSubmit}>Submit</Button>
 				<Button variant="secondary" type="button" className="ml-2" onClick={this.props.onCancel}>Cancel</Button>
+				{this.props.productId && 
+					<React.Fragment>
+						<Table className="mb-2 mt-4">
+							<thead>
+								<tr>
+									<th>Contractor</th>
+									<th>Price</th>
+									<th></th>
+								</tr>
+							</thead>
+							<tbody>
+								{this.state.contractorPrices.map(p => {
+									return (
+										<tr>
+											<td>{p.contractorId}</td>
+											<td>{p.price.toFixed(2)}</td>
+											<td><a href="#" className="text-danger" onClick={()=>this.handleRemoveContractorPrice(p.contractorId)}><X/></a></td>
+										</tr>
+									)
+								})}
+							</tbody>
+						</Table>
+						<Form.Row>
+							<Form.Group as={Col} md={8} >
+								<Form.Label>NIP</Form.Label>
+								<Form.Control placeholder="NIP" type="number" 
+									name="nip"
+									max={9999999999}
+									onChange={this.handleContractorInputChange} />
+							</Form.Group>
+
+							<Form.Group as={Col}>
+								<Form.Label>Price</Form.Label>
+								<Form.Control type="number" step="0.01"
+									name="price"
+									onChange={this.handleContractorInputChange} />
+							</Form.Group>
+
+						</Form.Row>
+						<p>{this.state.foundContractor ? this.state.foundContractor.Name : "Contractor not found"}</p>
+						<Button variant="primary" type="button" disabled={!this.state.foundContractor || !this.state.addingContractor.price} onClick={this.handleAddContractorPrice} className="mb-2">Add Contractor Price</Button> <br></br>
+					</React.Fragment>
+				}
+				
 			</Form>
 		)
 	}

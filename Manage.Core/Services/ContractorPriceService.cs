@@ -68,7 +68,7 @@ namespace Manage.Core.Services
                     ErrorMessage = "Product id can't be 0"
                 };
 
-            var foundContractorPrice = contractorPriceRepostiory.GetByProductId(productId);
+            var foundContractorPrice = contractorPriceRepostiory.GetByContractorIdAndProductId(contractorId, productId);
 
             if (foundContractorPrice is null)
                 return new BaseReponse
@@ -87,7 +87,16 @@ namespace Manage.Core.Services
             };
         }
 
-        public async Task<ContractorPriceDTO> GetByProductId(long productId) => await Task.Run(() => mapper.Map<ContractorPriceDTO>(contractorPriceRepostiory.GetByProductId(productId)));
+        public async Task<ICollection<ContractorPriceDTO>> GetByProductId(long productId)
+        {
+            var contractorPrices = await Task.Run(() =>
+            {
+                return contractorPriceRepostiory.GetByProductId(productId)
+                    .ToList();
+            });
+
+            return mapper.Map<List<ContractorPriceDTO>>(contractorPrices);
+        }
 
         public async Task<ICollection<ContractorPriceDTO>> GetList(long contractorId)
         {
