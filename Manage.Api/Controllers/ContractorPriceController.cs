@@ -45,7 +45,7 @@ namespace Manage.Api.Controllers
         }
 
         [HttpGet("Product/{productId}")]
-        public async Task<ActionResult<ContractorPriceDTO>> GetOneByProductId(long productId)
+        public async Task<ActionResult<ICollection<ContractorPriceDTO>>> GetOneByProductId(long productId)
         {
             var result = await contractorPriceService.GetByProductId(productId);
             return result is not null ? Ok(result) : NotFound();
