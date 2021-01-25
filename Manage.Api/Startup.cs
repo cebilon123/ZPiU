@@ -1,4 +1,6 @@
 using AutoMapper;
+using Manage.Core.ExternalProviders;
+using Manage.Core.ExternalProviders.Interfaces;
 using Manage.Core.Mapper.Profiles;
 using Manage.Data;
 using Manage.Data.Models;
@@ -55,6 +57,7 @@ namespace Manage.Api
                 .AddScoped(typeof(IProductRepository), typeof(ProductRepository))
                 .AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository))
                 .AddScoped(typeof(IContractorPriceRepostiory), typeof(ContractorPriceRepostiory))
+                .AddSingleton(typeof(IContractorProvider), typeof(ContractorProviderMock))
                 .AddAutoMapper(typeof(BaseProfile));
 
             services.AddControllers();

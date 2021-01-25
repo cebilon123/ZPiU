@@ -15,5 +15,6 @@ namespace Manage.Core.Services.Interfaces
         Task<ProductDTO> Get(long id);
         Task<ICollection<ProductDTO>> GetAll();
         Task<ProductUpdateResponse> Update(CreateProductRequest request, long id);
+        Task<ICollection<ProductDTO>> GetByNip(string nip);
     }
 }

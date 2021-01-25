@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Manage.Core.ExternalProviders.Interfaces;
 using Manage.Core.Models.Category;
 using Manage.Core.Models.Product;
 using Manage.Core.Services;
@@ -18,12 +19,12 @@ namespace Manage.Api.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService productService;
-        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper)
+        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IContractorProvider contractorProvider, IContractorPriceRepostiory contractorPriceRepostiory, IMapper mapper)
         {
-            productService = new ProductService(productRepository, categoryRepository, mapper);
+            productService = new ProductService(productRepository, categoryRepository, contractorProvider, contractorPriceRepostiory, mapper);
         }
         [HttpPost]
-        public async Task<ActionResult> Create([FromBody]CreateProductRequest request)
+        public async Task<ActionResult> Create([FromBody] CreateProductRequest request)
         {
             var result = await productService.Create(request);
             return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);
@@ -49,8 +50,20 @@ namespace Manage.Api.Controllers
             return result.Any() ? Ok(result) : NotFound();
         }
 
+        /// <summary>
+        /// Returns collection of all products. If nip is given, then it returns collection of products
+        /// which prices are replaced by prices set for contractor.
+        /// </summary>
+        /// <param name="nip">Nip of contractor</param>
+        /// <returns></returns>
+        [HttpGet("nip/{nip}")]     
+        public async Task<ActionResult<ICollection<ProductDTO>>> GetByNip(string nip)
+        {
+            return Ok(await productService.GetByNip(nip));
+        }
+
         [HttpPut("{id}")]
-        public async Task<ActionResult<ProductUpdateResponse>> Update([FromBody]CreateProductRequest request, long id)
+        public async Task<ActionResult<ProductUpdateResponse>> Update([FromBody] CreateProductRequest request, long id)
         {
             var result = await productService.Update(request, id);
             return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);
