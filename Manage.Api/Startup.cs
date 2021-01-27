@@ -57,7 +57,7 @@ namespace Manage.Api
                 .AddScoped(typeof(IProductRepository), typeof(ProductRepository))
                 .AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository))
                 .AddScoped(typeof(IContractorPriceRepostiory), typeof(ContractorPriceRepostiory))
-                .AddSingleton(typeof(IContractorProvider), new ContractorProvider(Configuration["https://webapo20210110092719.azurewebsites.net/api/kontrahenci"]))
+                .AddSingleton(typeof(IContractorProvider), new ContractorProvider(Configuration["ContractorApi"]))
                 .AddAutoMapper(typeof(BaseProfile));
 
             services.AddControllers();
