@@ -39,18 +39,18 @@ namespace Manage.Core.ExternalProviders
                     Name = obtainedContractor.Nazwa,
                     Nip = obtainedContractor.Numer_Nip,
                     PhoneNumber = obtainedContractor.Telefon,
-                    Id = obtainedContractor.Id
+                    Id = obtainedContractor.KontrahentId
                 };
             }   
         }
 
 
         /// <summary>
-        /// Object to translate it into our dto's. (Polish because of Pshybysh)
+        /// External object to translate it into our dto's. 
         /// </summary>
         private class ObtainedContractor
         {
-            public int Id { get; set; }
+            public int KontrahentId { get; set; }
             public string Nazwa { get; set; }
             public string Miasto { get; set; }
             public string Ulica { get; set; }
