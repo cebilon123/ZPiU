@@ -48,7 +48,7 @@ namespace Manage.Api
 
             services.AddDbContext<BaseContext>(o =>
             {
-                o.UseSqlServer(Configuration["ConnectionStrings:SqlConnectionString"]);
+                o.UseSqlServer("Server=tcp:zpiudatabase.database.windows.net,1433;Initial Catalog=Manage.Api_db;Persist Security Info=False;User ID= Projectzpiua;Password= Projectzpiu!1a;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             });
 
 
@@ -57,7 +57,7 @@ namespace Manage.Api
                 .AddScoped(typeof(IProductRepository), typeof(ProductRepository))
                 .AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository))
                 .AddScoped(typeof(IContractorPriceRepostiory), typeof(ContractorPriceRepostiory))
-                .AddSingleton(typeof(IContractorProvider), typeof(ContractorProviderMock))
+                .AddSingleton(typeof(IContractorProvider), new ContractorProvider(Configuration["ConnectionStrings:ContractorApiUrl"]))
                 .AddAutoMapper(typeof(BaseProfile));
 
             services.AddControllers();
