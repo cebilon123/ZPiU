@@ -48,7 +48,7 @@ namespace Manage.Api
 
             services.AddDbContext<BaseContext>(o =>
             {
-                o.UseSqlServer(Configuration["ConnectionStrings:SqlConnectionString"]);
+                o.UseSqlServer("Server=tcp:zpiudatabase.database.windows.net,1433;Initial Catalog=Manage.Api_db;Persist Security Info=False;User ID= Projectzpiua;Password= Projectzpiu!1a;MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;");
             });
 
 

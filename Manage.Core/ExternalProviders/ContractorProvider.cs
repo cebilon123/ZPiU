@@ -22,26 +22,23 @@ namespace Manage.Core.ExternalProviders
 
         public async Task<ExternalContractor> GetContractorByNip(string nip)
         {
-            using (httpClient)
+            var result = await httpClient.GetAsync($"{contractorApiAdress}/{nip}");
+            var obtainedContractor = JsonConvert.DeserializeObject<ObtainedContractor>(await result.Content.ReadAsStringAsync());
+
+            if (obtainedContractor is null)
+                return null;
+
+            //Mapping for our internal model
+            return new ExternalContractor
             {
-                var result = await httpClient.GetAsync($"{contractorApiAdress}/{nip}");
-                var obtainedContractor = JsonConvert.DeserializeObject<ObtainedContractor>(await result.Content.ReadAsStringAsync());
-
-                if (obtainedContractor is null)
-                    return null;
-
-                //Mapping for our internal model
-                return new ExternalContractor
-                {
-                    Adress = obtainedContractor.Miasto,
-                    BuildingNumer = obtainedContractor.Nr_Budynku,
-                    Email = obtainedContractor.Email,
-                    Name = obtainedContractor.Nazwa,
-                    Nip = obtainedContractor.Numer_Nip,
-                    PhoneNumber = obtainedContractor.Telefon,
-                    Id = obtainedContractor.KontrahentId
-                };
-            }   
+                Adress = obtainedContractor.Miasto,
+                BuildingNumer = obtainedContractor.Nr_Budynku,
+                Email = obtainedContractor.Email,
+                Name = obtainedContractor.Nazwa,
+                Nip = obtainedContractor.Numer_Nip,
+                PhoneNumber = obtainedContractor.Telefon,
+                Id = obtainedContractor.KontrahentId
+            };
         }
 
 
