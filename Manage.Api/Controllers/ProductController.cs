@@ -27,27 +27,38 @@ namespace Manage.Api.Controllers
         public async Task<ActionResult> Create([FromBody] CreateProductRequest request)
         {
             var result = await productService.Create(request);
-            return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);
+
+            if (result.IsSuccessful)
+                return Ok();
+
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult> Delete(long id)
         {
             var result = await productService.Delete(id);
-            return result.IsSuccessful ? Ok() : BadRequest(result.ErrorMessage);
+            if (!result.IsSuccessful)
+                return BadRequest(result.ErrorMessage);
+
+
+            return Ok();
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<ProductDTO>> Get(long id)
         {
             var result = await productService.Get(id);
-            return result is not null ? Ok(result) : NotFound();
+
+            if (result != null)
+                return Ok(result);
+
+            return NotFound();
         }
         [HttpGet]
-        public async Task<ActionResult<ProductDTO>> GetAll()
+        public async Task<ActionResult<ICollection<ProductDTO>>> GetAll()
         {
-            var result = await productService.GetAll();
-            return result.Any() ? Ok(result) : NotFound();
+            return Ok(await productService.GetAll());
         }
 
         /// <summary>
@@ -66,7 +77,11 @@ namespace Manage.Api.Controllers
         public async Task<ActionResult<ProductUpdateResponse>> Update([FromBody] CreateProductRequest request, long id)
         {
             var result = await productService.Update(request, id);
-            return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);
+
+            if (result.IsSuccessful)
+                return Ok(result);
+
+            return BadRequest(result.ErrorMessage);
         }
     }
 }

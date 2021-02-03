@@ -26,21 +26,33 @@ namespace Manage.Api.Controllers
         public async Task<ActionResult<CategoryCreateResponse>> Create([FromBody] CategoryCreateRequest request)
         {
             var result = await categoryService.Create(request);
-            return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);
+
+            if (result.IsSuccessful)
+                return Ok();
+
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpDelete("{id}")]
         public async Task<ActionResult<CategoryDeleteResponse>> Remove(long id)
         {
             var result = await categoryService.Delete(id);
-            return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);
+
+            if (result.IsSuccessful)
+                return Ok(result);
+
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpGet("{id}")]
         public async Task<ActionResult<CategoryGetResponse>> Get(long id)
         {
             var result = await categoryService.Get(id);
-            return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);
+
+            if (result.IsSuccessful)
+                return Ok(result);
+
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpGet("List")]

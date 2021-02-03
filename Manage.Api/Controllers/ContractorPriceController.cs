@@ -27,35 +27,45 @@ namespace Manage.Api.Controllers
         public async Task<ActionResult> Create([FromBody] ContractorPriceCreate request)
         {
             var result = await contractorPriceService.Create(request);
-            return result.IsSuccessful ? Ok() : BadRequest(result.ErrorMessage);
+
+            if (result.IsSuccessful)
+                return Ok();
+
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpDelete("{contractorId}/{productId}")]
         public async Task<ActionResult> Delete(long contractorId, long productId)
         {
             var result = await contractorPriceService.Delete(contractorId, productId);
-            return result.IsSuccessful ? Ok() : BadRequest(result.ErrorMessage);
+
+            if (result.IsSuccessful)
+                return Ok();
+
+            return BadRequest(result.ErrorMessage);
         }
 
         [HttpGet("Contractor/{contractorId}")]
         public async Task<ActionResult<ICollection<ContractorPriceDTO>>> GetList(long contractorId)
         {
-            var result = await contractorPriceService.GetList(contractorId);
-            return result is not null ? Ok(result) : NotFound();
+            return Ok(await contractorPriceService.GetList(contractorId));
         }
 
         [HttpGet("Product/{productId}")]
         public async Task<ActionResult<ICollection<ContractorPriceDTO>>> GetOneByProductId(long productId)
         {
-            var result = await contractorPriceService.GetByProductId(productId);
-            return result is not null ? Ok(result) : NotFound();
+            return Ok(await contractorPriceService.GetByProductId(productId));
         }
 
         [HttpPut("{id}")]
         public async Task<ActionResult<CategoryUpdateResponse>> UpdateByContractorPriceId([FromBody] ContractorPriceCreate request, long id)
         {
             var result = await contractorPriceService.Update(request, id);
-            return result.IsSuccessful ? Ok(result) : BadRequest(result.ErrorMessage);
+
+            if (result.IsSuccessful)
+                return Ok(result);
+
+            return BadRequest(result.ErrorMessage);
         }
     }
 }
