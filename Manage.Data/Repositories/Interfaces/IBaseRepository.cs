@@ -10,7 +10,7 @@ namespace Manage.Data.Repositories.Interfaces
     {
         IEnumerable<T> GetAll();
         T Get(long id);
-        void Insert(T entity);
+        long Insert(T entity);
         void Update(T entity);
         void Delete(T entity);
     }

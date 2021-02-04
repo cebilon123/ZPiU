@@ -33,6 +33,8 @@ interface IProductListState {
 
 interface IProductListProps {
 	categories: ICategory[]
+	contractor?: { KontrahentId: number, Nazwa: string, Numer_Nip: string }
+	goHome?: () => void
 }
 
 class ProductList extends Component<IProductListProps, IProductListState> {
@@ -116,7 +118,8 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 	}
 
 	fetchAll() {
-		fetch(this.urlBase+'/api/Product/')
+		const nip = this.props.contractor?.Numer_Nip
+		fetch(this.urlBase+'/api/Product/'+(nip?'nip/'+nip:''))
 			.then(res => {
 				if (res.status !== 200) return
 				res.json().then((products) => {
@@ -127,6 +130,12 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 
 	componentDidMount() {
 		this.fetchAll()
+	}
+
+	componentDidUpdate(prevProps: IProductListProps) {
+		if (prevProps.contractor !== this.props.contractor) {
+			this.fetchAll()
+		}
 	}
 
 
@@ -205,7 +214,12 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 	render() {
 		return (
 			<Card>
-				<Card.Header>Items <Button className="ml-4" onClick={this.handleAdd}>Add</Button> <Button variant="secondary" onClick={this.toggleSearch}>Search</Button></Card.Header>
+				<Card.Header>Items {this.props.contractor && <b>{this.props.contractor.Nazwa}</b>}
+				{!this.props.contractor ?
+					<><Button className="ml-4" onClick={this.handleAdd}>Add</Button> <Button variant="secondary" onClick={this.toggleSearch}>Search</Button></>
+					: <Button className="ml-4" onClick={() => this.props.goHome && this.props.goHome()}>Back</Button> 
+				}
+				</Card.Header>
 				{this.state.searchOpen && this.renderSearch()}
 				<Table>
 					<thead>
@@ -222,7 +236,7 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 						</tr>
 					</thead>
 					<tbody>
-						{this.state.isAdding &&
+						{this.state.isAdding && !this.props.contractor &&
 							<tr><td colSpan={9}><ProductEditor onSubmit={this.handleSubmit} onCancel={this.handleCancel} categories={this.props.categories}></ProductEditor></td></tr>
 						}
 						{this.state.products.sort((a, b) => {
@@ -248,10 +262,12 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 										<td>{product.gtuCode}</td>
 										<td>{product.category?.name}</td>
 										<td>
-											<a href="#" className="text-primary" onClick={()=>this.handleEdit(product.id)}><Pencil/></a>&nbsp;&nbsp;<a href="#" className="text-danger" onClick={()=>this.handleRemove(product.id)}><X/></a>
+										{!this.props.contractor &&
+											<><a href="#" className="text-primary" onClick={()=>this.handleEdit(product.id)}><Pencil/></a>&nbsp;&nbsp;<a href="#" className="text-danger" onClick={()=>this.handleRemove(product.id)}><X/></a></>
+											}
 										</td>
 									</tr>
-									{this.state.editingId === product.id && <tr><td colSpan={9}><ProductEditor onSubmit={this.handleSubmit} onCancel={this.handleCancel} productId={product.id} categories={this.props.categories}></ProductEditor></td></tr>}
+									{this.props.contractor && this.state.editingId === product.id && <tr><td colSpan={9}><ProductEditor onSubmit={this.handleSubmit} onCancel={this.handleCancel} productId={product.id} categories={this.props.categories}></ProductEditor></td></tr>}
 								</React.Fragment>)
 							})
 						}

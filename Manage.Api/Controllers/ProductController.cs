@@ -19,9 +19,9 @@ namespace Manage.Api.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService productService;
-        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IContractorProvider contractorProvider, IContractorPriceRepostiory contractorPriceRepostiory, IMapper mapper)
+        public ProductController(IProductRepository productRepository, ICategoryRepository categoryRepository, IContractorProvider contractorProvider, IContractorRepository contractorRepository, IContractorPriceRepostiory contractorPriceRepostiory, IMapper mapper)
         {
-            productService = new ProductService(productRepository, categoryRepository, contractorProvider, contractorPriceRepostiory, mapper);
+            productService = new ProductService(productRepository, categoryRepository, contractorRepository, contractorProvider,  contractorPriceRepostiory, mapper);
         }
         [HttpPost]
         public async Task<ActionResult> Create([FromBody] CreateProductRequest request)

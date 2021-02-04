@@ -14,5 +14,8 @@ namespace Manage.Data.Repositories
         {
 
         }
+
+        public Contractor GetByExternalId(long externalId) => context.Contractors
+            .FirstOrDefault(c => c.ExternalId == externalId);
     }
 }
