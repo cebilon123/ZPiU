@@ -40,16 +40,24 @@ namespace Manage.Core.Services
 
             var insertObject = mapper.Map<ContractorPrice>(request);
             var contractor = new Contractor();
-            contractor.Id = request.ContractorId;
+            contractor.ExternalId = request.ContractorId;
             contractor.Name = request.ContractorName;
 
             await Task.Run(() =>
             {
-                contractorPriceRepostiory.Insert(insertObject);
-                if (contractorRepository.Get(request.ContractorId) == null)
-                {
+                var foundContractor = contractorRepository.Get(request.ContractorId);
+
+                if (foundContractor == null)
                     contractorRepository.Insert(contractor);
+                else
+                {
+                    foundContractor.Name = contractor.Name;
+                    foundContractor.ExternalId = contractor.ExternalId;
+                    contractorRepository.Update(foundContractor);
                 }
+                    
+
+                contractorPriceRepostiory.Insert(insertObject);
             });
 
             if (insertObject.Id is 0)

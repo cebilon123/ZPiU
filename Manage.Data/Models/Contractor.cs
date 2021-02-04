@@ -9,6 +9,7 @@ namespace Manage.Data.Models
 {
     public class Contractor: BaseEntity
     {
+        public long ExternalId { get; set; }
         public string Name { get; set; }
     }
 }

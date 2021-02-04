@@ -48,7 +48,7 @@ namespace Manage.Api
 
             services.AddDbContext<BaseContext>(o =>
             {
-                o.UseSqlServer("Server=MYCOMP\\SQLEXPRESS;Database=Project;Trusted_Connection=True;");
+                o.UseSqlServer("Server=.;Database=Project;Trusted_Connection=True;");
             });
 
 
@@ -58,6 +58,7 @@ namespace Manage.Api
                 .AddScoped(typeof(ICategoryRepository), typeof(CategoryRepository))
                 .AddScoped(typeof(IContractorPriceRepostiory), typeof(ContractorPriceRepostiory))
                 .AddSingleton(typeof(IContractorProvider), new ContractorProvider(Configuration["ContractorApi"]))
+                .AddScoped(typeof(IContractorRepository), typeof(ContractorRepository))
                 .AddAutoMapper(typeof(BaseProfile));
 
             services.AddControllers();
