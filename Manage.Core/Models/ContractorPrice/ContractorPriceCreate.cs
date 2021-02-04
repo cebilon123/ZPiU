@@ -14,6 +14,8 @@ namespace Manage.Core.Models.ContractorPrice
         [Required]
         public long ContractorId { get; set; }
         [Required]
+        public string ContractorName { get; set; }
+        [Required]
         public decimal Price { get; set; }
     }
 }

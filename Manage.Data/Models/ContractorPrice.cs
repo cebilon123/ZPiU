@@ -12,7 +12,9 @@ namespace Manage.Data.Models
         [ForeignKey(nameof(Product))]
         public long ProductId { get; set; }
         public virtual Product Product { get; set; }
+        [ForeignKey(nameof(Contractor))]
         public long ContractorId { get; set; }
+        public virtual Contractor Contractor { get; set; }
         public decimal Price { get; set; }
     }
 }

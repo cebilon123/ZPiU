@@ -14,7 +14,7 @@ interface IContractorPrice {
 interface IProductEditorState {
 	product: IProduct,
 	addingContractor: { nip?: number, price?: number }
-	foundContractor?: { Id: number, Name: string }
+	foundContractor?: { KontrahentId: number, Nazwa: string }
 	contractorPrices: IContractorPrice[]
 }
 
@@ -126,7 +126,7 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 	}
 
 	fetchContractor(nip: string) {
-		fetch(this.contractorUrlBase+`/kontrahenci/nip/${nip}`)
+		fetch(this.contractorUrlBase+`/kontrahenci/${nip}`)
 			.then(res => {
 				if (res.status !== 200) {
 					this.setState({foundContractor: undefined})
@@ -157,7 +157,7 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 				headers: {
 					'Content-Type': 'application/json'
 				},
-				body: JSON.stringify({ productId: this.state.product.id, contractorId: this.state.foundContractor.Id, price: this.state.addingContractor.price })
+				body: JSON.stringify({ productId: this.state.product.id, contractorId: this.state.foundContractor.KontrahentId, contractorName: this.state.foundContractor.Nazwa, price: this.state.addingContractor.price })
 			})
 				.then(res => {
 					console.log(this.state.product)
@@ -262,7 +262,7 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 							<tbody>
 								{this.state.contractorPrices.map(p => {
 									return (
-										<tr>
+										<tr key={p.contractorId}>
 											<td>{p.contractorId}</td>
 											<td>{p.price.toFixed(2)}</td>
 											<td><a href="#" className="text-danger" onClick={()=>this.handleRemoveContractorPrice(p.contractorId)}><X/></a></td>
@@ -288,7 +288,7 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 							</Form.Group>
 
 						</Form.Row>
-						<p>{this.state.foundContractor ? this.state.foundContractor.Name : "Contractor not found"}</p>
+						<p>{this.state.foundContractor ? this.state.foundContractor.Nazwa : "Contractor not found"}</p>
 						<Button variant="primary" type="button" disabled={!this.state.foundContractor || !this.state.addingContractor.price} onClick={this.handleAddContractorPrice} className="mb-2">Add Contractor Price</Button> <br></br>
 					</React.Fragment>
 				}

@@ -18,9 +18,9 @@ namespace Manage.Api.Controllers
     public class ContractorPriceController : ControllerBase
     {
         private readonly IContractorPriceService contractorPriceService;
-        public ContractorPriceController(IContractorPriceRepostiory contractorPriceRepostiory, IMapper mapper)
+        public ContractorPriceController(IContractorPriceRepostiory contractorPriceRepostiory, IContractorRepository contractorRepository, IMapper mapper)
         {
-            contractorPriceService = new ContractorPriceService(contractorPriceRepostiory, mapper);
+            contractorPriceService = new ContractorPriceService(contractorPriceRepostiory, contractorRepository, mapper);
         }
 
         [HttpPost]

@@ -20,7 +20,7 @@ namespace Manage.Data.Repositories
             .Where(c => c.ContractorId == contractorId)
             .Include(ctx => ctx.Product);
 
-        public IEnumerable<ContractorPrice> GetByProductId(long productId) => context.ContractorsPrices.Where(c => c.ProductId == productId).Include(ctx => ctx.Product);
+        public IEnumerable<ContractorPrice> GetByProductId(long productId) => context.ContractorsPrices.Where(c => c.ProductId == productId).Include(ctx => ctx.Product).Include(ctx => ctx.Contractor);
 
         public ContractorPrice GetByContractorIdAndProductId(long contractorId, long productId) => context.ContractorsPrices
             .FirstOrDefault(c => c.ContractorId == contractorId && c.ProductId == productId);

@@ -15,11 +15,13 @@ namespace Manage.Core.Services
     public class ContractorPriceService : IContractorPriceService
     {
         private readonly IContractorPriceRepostiory contractorPriceRepostiory;
+        private readonly IContractorRepository contractorRepository;
         private readonly IMapper mapper;
 
-        public ContractorPriceService(IContractorPriceRepostiory contractorPriceRepostiory, IMapper mapper)
+        public ContractorPriceService(IContractorPriceRepostiory contractorPriceRepostiory, IContractorRepository contractorRepository, IMapper mapper)
         {
             this.contractorPriceRepostiory = contractorPriceRepostiory;
+            this.contractorRepository = contractorRepository;
             this.mapper = mapper;
         }
 
@@ -37,10 +39,17 @@ namespace Manage.Core.Services
                 };
 
             var insertObject = mapper.Map<ContractorPrice>(request);
+            var contractor = new Contractor();
+            contractor.Id = request.ContractorId;
+            contractor.Name = request.ContractorName;
 
             await Task.Run(() =>
             {
                 contractorPriceRepostiory.Insert(insertObject);
+                if (contractorRepository.Get(request.ContractorId) == null)
+                {
+                    contractorRepository.Insert(contractor);
+                }
             });
 
             if (insertObject.Id is 0)
