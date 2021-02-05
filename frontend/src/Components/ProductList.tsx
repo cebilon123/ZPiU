@@ -57,7 +57,6 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 		this.handleCancel = this.handleCancel.bind(this)
 		this.handleEdit = this.handleEdit.bind(this)
 		this.toggleSearch = this.toggleSearch.bind(this)
-		// this.handleSearchInputChange = _.throttle(this.handleSearchInputChange.bind(this), 300) // this is buggy
 		this.handleSearchInputChange = this.handleSearchInputChange.bind(this)
 	}
 
@@ -267,7 +266,7 @@ class ProductList extends Component<IProductListProps, IProductListState> {
 											}
 										</td>
 									</tr>
-									{this.props.contractor && this.state.editingId === product.id && <tr><td colSpan={9}><ProductEditor onSubmit={this.handleSubmit} onCancel={this.handleCancel} productId={product.id} categories={this.props.categories}></ProductEditor></td></tr>}
+									{!this.props.contractor && this.state.editingId === product.id && <tr><td colSpan={9}><ProductEditor onSubmit={this.handleSubmit} onCancel={this.handleCancel} productId={product.id} categories={this.props.categories}></ProductEditor></td></tr>}
 								</React.Fragment>)
 							})
 						}

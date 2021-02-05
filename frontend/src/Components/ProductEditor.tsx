@@ -208,7 +208,7 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 						<Form.Control type="number" step="1"
 							name="vat"
             				value={this.state.product.vat}
-            				onChange={this.handleInputChange} />
+            				onChange={(e) => this.handleInputChange(e, true)} />
 					</Form.Group>
 				</Form.Row>
 
