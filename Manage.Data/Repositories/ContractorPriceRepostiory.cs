@@ -18,8 +18,7 @@ namespace Manage.Data.Repositories
 
         public IEnumerable<ContractorPrice> GetByContractorId(long contractorId) => context.ContractorsPrices
             .Where(c => c.ContractorId == contractorId)
-            .Include(ctx => ctx.Product)
-            .Include(ctx => ctx.Contractor);
+            .Include(ctx => ctx.Product);
 
         public IEnumerable<ContractorPrice> GetByProductId(long productId) => context.ContractorsPrices
             .Where(c => c.ProductId == productId).Include(ctx => ctx.Product)

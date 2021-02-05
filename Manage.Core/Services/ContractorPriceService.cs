@@ -45,18 +45,19 @@ namespace Manage.Core.Services
 
             await Task.Run(() =>
             {
-                var foundContractor = contractorRepository.Get(request.ContractorId);
-
+                var foundContractor = contractorRepository.GetByExternalId(request.ContractorId);
+                long id;
                 if (foundContractor == null)
-                    contractorRepository.Insert(contractor);
+                    id = contractorRepository.Insert(contractor);
                 else
                 {
+                    id = foundContractor.Id;
                     foundContractor.Name = contractor.Name;
                     foundContractor.ExternalId = contractor.ExternalId;
                     contractorRepository.Update(foundContractor);
                 }
-                    
 
+                insertObject.ContractorId = id;
                 contractorPriceRepostiory.Insert(insertObject);
             });
 

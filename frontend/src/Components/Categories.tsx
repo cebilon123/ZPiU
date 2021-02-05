@@ -45,7 +45,6 @@ class Categories extends Component<ICategoriesProps, ICategoriesState> {
 			},
 			body: JSON.stringify({ Name: this.fieldValue })
 		})
-			.then(res => res.json())
 			.then(() => {
 				this.fetchAll()
 			})

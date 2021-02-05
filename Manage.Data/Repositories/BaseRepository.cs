@@ -37,13 +37,14 @@ namespace Manage.Data.Repositories
             return context.Set<T>().AsEnumerable();
         }
 
-        public void Insert(T entity)
+        public long Insert(T entity)
         {
             if (entity is null)
                 throw new ArgumentNullException($"Entity is null {nameof(entity)}");
 
             context.Set<T>().Add(entity);
             context.SaveChanges();
+            return entity.Id;
         }
 
         public void Update(T entity)

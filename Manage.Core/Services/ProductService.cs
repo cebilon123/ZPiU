@@ -19,13 +19,15 @@ namespace Manage.Core.Services
         private readonly ICategoryRepository categoryRepository;
         private readonly IContractorProvider contractorProvider;
         private readonly IContractorPriceRepostiory contractorPriceRepostiory;
+        private readonly IContractorRepository contractorRepository;
         private readonly IMapper mapper;
 
-        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IContractorProvider contractorProvider, IContractorPriceRepostiory contractorPriceRepostiory, IMapper mapper)
+        public ProductService(IProductRepository productRepository, ICategoryRepository categoryRepository, IContractorRepository contractorRepository, IContractorProvider contractorProvider, IContractorPriceRepostiory contractorPriceRepostiory, IMapper mapper)
         {
             this.productRepository = productRepository;
             this.categoryRepository = categoryRepository;
             this.contractorProvider = contractorProvider;
+            this.contractorRepository = contractorRepository;
             this.contractorPriceRepostiory = contractorPriceRepostiory;
             this.mapper = mapper;
         }
@@ -94,8 +96,13 @@ namespace Manage.Core.Services
             if (foundContractor is null)
                 return null;
 
+            var contractor = contractorRepository.GetByExternalId(foundContractor.Id);
+
+            if (contractor is null)
+                return null;
+
             var contractorPrices = contractorPriceRepostiory
-                .GetByContractorId(foundContractor.Id);
+                .GetByContractorId(contractor.Id);
 
             var products = await GetAll();
 

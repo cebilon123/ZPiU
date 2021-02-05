@@ -5,9 +5,12 @@ import { config } from '../Constants'
 import { IProduct } from './ProductList'
 import { ICategory } from './Categories'
 import { X } from 'react-bootstrap-icons'
+import { returnStatement } from '@babel/types'
 
-interface IContractorPrice {
+export interface IContractorPrice {
 	contractorId: number
+	contractorExternalId: number
+	contractorName: number
 	productId: number
 	price: number
 }
@@ -35,7 +38,7 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 		this.state = {
 			product: {
 				id: 0,
-				categoryId: 9,
+				categoryId: -1,
 				name: '',
 				price: 0.00,
 				vat: 23,
@@ -55,23 +58,27 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 		this.fetchContractor = this.fetchContractor.bind(this)
 	}
 
-	handleInputChange(event: any) {
+	handleInputChange(event: any, number?: boolean) {
 		const target = event.target;
 		const value = target.type === 'checkbox' ? target.checked : target.value;
 		const name = target.name;
 	
 		this.setState({
-			product: { ...this.state.product, [name]: value } as IProduct
+			product: { ...this.state.product, [name]: number ? parseFloat(value) : value } as IProduct
 		})
 	}
 
 	handleContractorInputChange(event: any) {
 		const target = event.target;
-		const value = target.type === 'checkbox' ? target.checked : target.value;
+		let value = target.type === 'checkbox' ? target.checked : target.value;
 		const name = target.name;
 
 		if (name === 'nip' && value.length === 10) {
 			this.fetchContractor(value)
+		}
+
+		if (name === 'price') {
+			value = parseFloat(value)
 		}
 	
 		this.setState({
@@ -81,8 +88,10 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 
 	handleSubmit(event: any) {
 		const product = this.state.product
-		//delete product['category']
-		fetch(this.urlBase+'/api/Product/' + (this.state.product.id || ''), {
+		if (product.categoryId === -1) {
+			product.categoryId = this.props.categories[0].id
+		}
+		fetch(this.urlBase+'/api/Product/' + (product.id || ''), {
 			method: this.state.product.id ? 'PUT' : 'POST',
 			headers: {
 				'Content-Type': 'application/json'
@@ -92,9 +101,7 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 			.then(res => {
 				console.log(this.state.product)
 				if (res.status !== 200) return
-				res.json().then((product) => {
-					this.props.onSubmit()
-				})
+				this.props.onSubmit()
 			})
 	}
 
@@ -144,7 +151,6 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 			.then(res => {
 				if (res.status !== 200) return
 				res.json().then((contractorPrices) => {
-					console.log(contractorPrices)
 					this.setState({ contractorPrices })
 				})
 			})
@@ -160,7 +166,6 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 				body: JSON.stringify({ productId: this.state.product.id, contractorId: this.state.foundContractor.KontrahentId, contractorName: this.state.foundContractor.Nazwa, price: this.state.addingContractor.price })
 			})
 				.then(res => {
-					console.log(this.state.product)
 					if (res.status !== 200) return
 					this.fetchContractorPrices()
 				})
@@ -195,7 +200,7 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 						<Form.Control type="number" step="0.01"
 							name="price"
             				value={this.state.product.price}
-            				onChange={this.handleInputChange} />
+            				onChange={(e) => this.handleInputChange(e, true)} />
 					</Form.Group>
 
 					<Form.Group as={Col} controlId="Vat">
@@ -238,10 +243,10 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 							as="select"
 							name="categoryId"
 							value={this.state.product.categoryId}
-							onChange={this.handleInputChange}>
+							onChange={(e) => this.handleInputChange(e, true)}>
 								{this.props.categories.map((category, index) => {
 									return (
-										<option value={category.id}>{category.name}</option>
+										<option key={category.id} value={category.id}>{category.name}</option>
 									)
 								})}
 							</Form.Control>
@@ -254,7 +259,8 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 						<Table className="mb-2 mt-4">
 							<thead>
 								<tr>
-									<th>Contractor</th>
+									<th>Id</th>
+									<th>Contractor Name</th>
 									<th>Price</th>
 									<th></th>
 								</tr>
@@ -263,7 +269,8 @@ class ProductEditor extends Component<IProductEditorProps, IProductEditorState> 
 								{this.state.contractorPrices.map(p => {
 									return (
 										<tr key={p.contractorId}>
-											<td>{p.contractorId}</td>
+											<td>{p.contractorExternalId}</td>
+											<td>{p.contractorName}</td>
 											<td>{p.price.toFixed(2)}</td>
 											<td><a href="#" className="text-danger" onClick={()=>this.handleRemoveContractorPrice(p.contractorId)}><X/></a></td>
 										</tr>

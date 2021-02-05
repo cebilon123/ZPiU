@@ -9,6 +9,6 @@ namespace Manage.Data.Repositories.Interfaces
 {
     public interface IContractorRepository: IBaseRepository<Contractor>
     {
-        
+        Contractor GetByExternalId(long externalId);
     }
 }
